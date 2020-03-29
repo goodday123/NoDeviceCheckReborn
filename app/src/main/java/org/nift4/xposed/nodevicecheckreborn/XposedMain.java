@@ -1,6 +1,5 @@
 package org.nift4.xposed.nodevicecheckreborn;
 
-
 import java.io.File;
 
 import org.json.JSONObject;
@@ -13,7 +12,7 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
 public class XposedMain implements IXposedHookLoadPackage {
     @Override
     public void handleLoadPackage(LoadPackageParam lpparam) {
-        if ("android".equals(lpparam.packageName)) {
+        if ("android".equals(lpparam.packageName) || "com.google.android.gms".equals(lpparam.packageName)) {
             XposedHelpers.findAndHookMethod(File.class, "exists",
                     new XC_MethodHook() {
                         @Override
@@ -38,9 +37,10 @@ public class XposedMain implements IXposedHookLoadPackage {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) {
                         String name = (String) param.args[0];
-                        // Modify server response to pass CTS check
+                        // Modify server response to pass SafetyNet check
                         if ("ctsProfileMatch".equals(name)
-                                || "isValidSignature".equals(name)) {
+                                || "isValidSignature".equals(name)
+                                || "basicIntegrity".equals(name)) {
                             param.setResult(true);
                         }
                     }
